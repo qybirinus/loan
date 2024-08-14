@@ -10,30 +10,33 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
-import dj_database_url
 from pathlib import Path
-
+import dj_database_url
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Load environment variables from .env file
-from dotenv import load_dotenv
 env_file = BASE_DIR / '.env'
 if env_file.exists():
     load_dotenv(dotenv_path=env_file)
 
 # Quick-start development settings - unsuitable for production
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = os.environ.get('DEBUG') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-grka*6izmp8mw^tw1q51h7odurnd1h8-erz3nul_u2tfzd*e4r'
+# SECRET_KEY = 'django-insecure-grka*6izmp8mw^tw1q51h7odurnd1h8-erz3nul_u2tfzd*e4r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
 # ALLOWED_HOSTS = []
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['.render.com', 'localhost', '127.0.0.1']
+# DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# ALLOWED_HOSTS = ['.render.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
