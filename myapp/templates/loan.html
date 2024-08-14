@@ -1,0 +1,233 @@
+<!-- loan.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Loan List{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+{% block extra_js %}
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialize DataTables
+    $('#mytable1').DataTable({
+        searching: false,
+        paging: true,
+        info: true
+    });
+    $('#mytable2').DataTable({
+        searching: false,
+        paging: true,
+        info: true
+    });
+    $('#mytable3').DataTable({
+        searching: false,
+        paging: true,
+        info: true
+    });
+    $('#mytable4').DataTable({
+        searching: false,
+        paging: true,
+        info: true
+    });
+
+    // Save the selected tab to sessionStorage
+    $('#myTab a').on('click', function() {
+        const target = $(this).attr('data-bs-target').substring(1);
+        sessionStorage.setItem('currentTab', target);
+    });
+
+    // Load the saved tab from sessionStorage
+    const savedTab = sessionStorage.getItem('currentTab');
+    if (savedTab) {
+        $('#myTab a[href="#' + savedTab + '"]').tab('show');
+    }
+});
+</script>
+{% endblock %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Loan List</h1>
+    <p id="display">กำลังโหลดข้อมูล...</p>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+            <li class="breadcrumb-item">Tables</li>
+            <li class="breadcrumb-item active">Loan List</li>
+        </ol>
+    </nav>
+</div>
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Loan Data</h5>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-tab="tab1" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">จ่ายวันนี้</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profile-tab" data-tab="tab2" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">ทั้งหมด</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="contact-tab" data-tab="tab3" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">จบแล้ว</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt-2" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="table-responsive">
+                                <h6>รายการที่ยังไม่ได้จ่าย</h6>
+                                <table class="table" id="mytable1">
+                                    <thead>
+                                        <tr>
+                                            <th>วง</th>
+                                            <th>ลูกค้า</th>
+                                            <th>ผู้ดูแล</th>
+                                            <th>เงินต้น</th>
+                                            <th>งวด</th>
+                                            <th>ดอกเบี้ยรวม</th>
+                                            <th>ประเภท</th> <!-- เพิ่มคอลัมน์ประเภท -->
+                                            <th>สถานะ</th>
+                                            <th>รายละเอียด</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for loan in loans %}
+                                            {% if loan.status == 3 or loan.status == 2 %}
+                                                <tr>
+                                                    <td>{{ loan.name }}</td>
+                                                    <td>{{ loan.customer }}</td>
+                                                    <td>{{ loan.user }}</td>
+                                                    <td>{{ loan.principal }}</td>
+                                                    <td>{{ loan.installments }}</td>
+                                                    <td>{{ loan.interest }}</td>
+                                                    <td>{{ loan.loan_types.name }}</td> <!-- แสดงประเภท -->
+                                                    <td>
+                                                        {% if loan.status == 1 %} ปกติ {% elif loan.status == 2 %} ค้างจ่าย {% elif loan.status == 3 %} วันนี้ {% elif loan.status == 4 %} ยังไม่ถึงกำหนด {% elif loan.status == 5 %} ครบแล้ว {% elif loan.status == 6 %} จ่ายแล้ว {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'loan_detail' loan.loan_id %}" class="btn btn-sm btn-primary pull-right">รายละเอียด</a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="table-responsive">
+                                <table class="table" id="mytable3">
+                                    <thead>
+                                        <tr>
+                                            <th>วง</th>
+                                            <th>ลูกค้า</th>
+                                            <th>ผู้ดูแล</th>
+                                            <th>เงินต้น</th>
+                                            <th>งวด</th>
+                                            <th>ดอกเบี้ยรวม</th>
+                                            <th>ประเภท</th> <!-- เพิ่มคอลัมน์ประเภท -->
+                                            <th>สถานะ</th>
+                                            <th>รายละเอียด</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for loan in loans %}
+                                            {% if loan.status != 5 %}
+                                                <tr>
+                                                    <td>{{ loan.name }}</td>
+                                                    <td>{{ loan.customer }}</td>
+                                                    <td>{{ loan.user }}</td>
+                                                    <td>{{ loan.principal }}</td>
+                                                    <td>{{ loan.installments }}</td>
+                                                    <td>{{ loan.interest }}</td>
+                                                    <td>{{ loan.loan_types.name }}</td> <!-- แสดงประเภท -->
+                                                    <td>
+                                                        {% if loan.status == 1 %} ปกติ {% elif loan.status == 2 %} ค้างจ่าย {% elif loan.status == 3 %} วันนี้ {% elif loan.status == 4 %} ยังไม่ถึงกำหนด {% elif loan.status == 5 %} ครบแล้ว {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'loan_detail' loan.loan_id %}" class="btn btn-sm btn-primary pull-right">รายละเอียด</a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                            <div class="table-responsive">
+                                <table class="table" id="mytable4">
+                                    <thead>
+                                        <tr>
+                                            <th>วง</th>
+                                            <th>ลูกค้า</th>
+                                            <th>ผู้ดูแล</th>
+                                            <th>เงินต้น</th>
+                                            <th>งวด</th>
+                                            <th>ดอกเบี้ยรวม</th>
+                                            <th>ประเภท</th> <!-- เพิ่มคอลัมน์ประเภท -->
+                                            <th>สถานะ</th>
+                                            <th>รายละเอียด</th>
+                                            {% if loan.user_level == 0 %}
+                                            <th>ลบ</th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for loan in loans %}
+                                            {% if loan.status == 5 %}
+                                                <tr>
+                                                    <td>{{ loan.name }}</td>
+                                                    <td>{{ loan.customer }}</td>
+                                                    <td>{{ loan.user }}</td>
+                                                    <td>{{ loan.principal }}</td>
+                                                    <td>{{ loan.installments }}</td>
+                                                    <td>{{ loan.interest }}</td>
+                                                    <td>{{ loan.loan_types }}</td> <!-- แสดงประเภท -->
+                                                    <td>
+                                                        {% if loan.status == 1 %} ปกติ {% elif loan.status == 2 %} ค้างจ่าย {% elif loan.status == 3 %} วันนี้ {% elif loan.status == 4 %} ยังไม่ถึงกำหนด {% elif loan.status == 5 %} ครบแล้ว {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'loan_detail' loan.loan_id %}" class="btn btn-sm btn-primary pull-right">รายละเอียด</a>
+                                                    </td>
+                                                    {% if loan.user_level == 0 %}
+                                                    <td>
+                                                        <button onclick="deleteLoan({{ loan.loan_id }})" class="btn btn-sm btn-danger pull-right">ลบ</button>
+                                                    </td>
+                                                    {% endif %}
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end Tabs content -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    $('#myTab a').on('click', function() {
+      const target = $(this).attr('data-bs-target').substring(1);
+      localStorage.setItem('currentTab', target);
+      console.log(localStorage.getItem('currentTab'));
+    });
+
+    const savedTab = localStorage.getItem('currentTab');
+    if (savedTab) {
+      $('#myTab a[href="#' + savedTab + '"]').tab('show');
+      
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!-- Sidebar -->
+<aside id="sidebar" class="sidebar">
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+      <!-- Always visible -->
+      {% if request.session.position == 0 %}
+      <li class="nav-item">
+          <a class="nav-link" href="{% url 'index' %}">
+              <i class="bi bi-grid"></i>
+              <span>Dashboard</span>
+          </a>
+      </li><!-- End Dashboard Nav -->
+      {% endif %}
+      <li class="nav-heading">Pages</li>
+
+      <!-- Menus for Admin and Superadmin -->
+      {% if request.session.position == 0 or request.session.position == 1 or request.session.position == 2 %}
+      <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'loan' %}">
+              <i class="bi bi-person"></i>
+              <span>รายการทั้งหมด</span>
+          </a>
+      </li><!-- End Profile Page Nav -->
+      {% endif %}
+
+      <!-- Menu for Superadmin -->
+      {% if request.session.position == 0 %}
+      <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'addaccount' %}">
+              <i class="bi bi-question-circle"></i>
+              <span>Add Account</span>
+          </a>
+      </li><!-- End F.A.Q Page Nav -->
+      {% endif %}
+
+      <!-- Menus for Admin and Superadmin -->
+      {% if request.session.position == 0 or request.session.position == 1 or request.session.position == 2 %}
+      <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'add_loan' %}">
+              <i class="bi bi-envelope"></i>
+              <span>เพิ่มวง</span>
+          </a>
+      </li><!-- End Contact Page Nav -->
+      {% endif %}
+  </ul>
+</aside><!-- End Sidebar-->

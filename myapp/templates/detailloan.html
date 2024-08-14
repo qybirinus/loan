@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h1>รายละเอียดการกู้เงิน</h1>
+          <p>ชื่อ: {{ loan.name }}</p>
+          <p>ลูกค้า: {{ loan.customer }}</p>
+          <p>เริ่มต้นวันที่: {{ loan.start_date|date:"d-m-Y" }}</p>
+
+          <h2>การผ่อนชำระ</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>งวดที่</th>
+                  <th>วันครบกำหนด</th>
+                  <th>จำนวนเงิน</th>
+                  <th>สลิป</th>
+                  <th>สถานะ</th>
+                  <th>ดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody>
+           {% for payment in installments %}
+                    <tr>
+                      <td>{{ payment.installment_number }}</td>
+                      <td>{{ payment.due_date|date:"d-m-Y" }}</td>
+                      <td>{{ payment.amount }}</td>
+                      <td>
+                        {% if payment.slip %}
+                          <a href="{{ payment.slip.url }}">
+                            <img src="{{ payment.slip.url }}" alt="Slip" style="width: 50px; height: auto;">
+                          </a>
+                        {% elif payment.due_date > today %}
+                          ยังไม่ถึงกำหนด
+                        {% else %}
+                          ไม่มีสลิป
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if payment.slip %}
+                          จ่ายแล้ว
+                        {% elif payment.due_date == today %}
+                          วันนี้
+                        {% elif payment.due_date < today %}
+                          ค้าง
+                        {% else %}
+                          ยังไม่ถึงกำหนด
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if payment.id %}
+                          {% if not payment.slip %}
+                            <a href="{% url 'upload_slip' payment.id %}" class="btn btn-primary btn-sm">อัปโหลดสลิป</a>
+                          {% endif %}
+                        {% else %}
+                          <p>No payment ID available</p>
+
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+ 
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Back button -->
+          <button class="btn btn-secondary" id="backButton">กลับ</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const backButton = document.getElementById("backButton");
+
+    backButton.addEventListener("click", function() {
+      // Get the previously opened tab from sessionStorage
+      const currentTab = sessionStorage.getItem("currentTab");
+      // Redirect to the loan page and select the tab
+      if (currentTab) {
+        window.location.href = "{% url 'loan' %}#" + currentTab;
+      } else {
+        window.location.href = "{% url 'loan' %}";
+      }
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- สรุปข้อมูลเงินกู้ทั้งหมด -->
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">เงินกู้ทั้งหมด</h5>
+                    <p class="card-text">{{ total_loans }} รายการ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">เงินที่ค้างชำระ</h5>
+                    <p class="card-text">{{ total_outstanding_amount }} บาท</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">เงินที่ชำระแล้ว</h5>
+                    <p class="card-text">{{ total_paid_amount }} บาท</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">เงินกู้ครบกำหนด</h5>
+                    <p class="card-text">{{ total_due_loans }} รายการ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- สถานะการชำระเงิน -->
+    <div class="row">
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">การชำระเงินค้าง</h5>
+                    <p class="card-text">{{ overdue_payments_count }} รายการ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">การชำระเงินวันนี้</h5>
+                    <p class="card-text">{{ payments_today_count }} รายการ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">การชำระเงินครบกำหนด</h5>
+                    <p class="card-text">{{ due_payments_count }} รายการ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- สรุปการเงิน -->
+    <div class="row">
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">รายงานการชำระเงินรายวัน</h5>
+                    <canvas id="daily_payments_chart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">รายงานการชำระเงินรายเดือน</h5>
+                    <canvas id="monthly_payments_chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ข้อมูลเกี่ยวกับผู้ใช้งาน -->
+    <div class="row">
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">จำนวนผู้ใช้ทั้งหมด</h5>
+                    <p class="card-text">{{ total_users }} คน</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">สถานะผู้ใช้</h5>
+                    <p class="card-text">Active: {{ active_users_count }} คน</p>
+                    <p class="card-text">Inactive: {{ inactive_users_count }} คน</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('daily_payments_chart').getContext('2d');
+    var dailyPaymentsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ daily_labels|safe }},
+            datasets: [{
+                label: 'ยอดการชำระเงินรายวัน',
+                data: {{ daily_data|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    var ctx2 = document.getElementById('monthly_payments_chart').getContext('2d');
+    var monthlyPaymentsChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [{
+                label: 'ยอดการชำระเงินรายเดือน',
+                data: {{ monthly_data|safe }},
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

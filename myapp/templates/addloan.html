@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Loan{% endblock %}
+{% block extra_head %}
+    <!-- Additional styles or scripts for this specific page -->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Add Loan</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">Home</li>
+        <li class="breadcrumb-item">Forms</li>
+        <li class="breadcrumb-item active">Add Loan</li>
+      </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section class="section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Add Loan Form</h5>
+            {% if success_message %}
+            <div class="alert alert-success" role="alert">
+                {{ success_message }}
+            </div>
+            {% endif %}
+            {% if error_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
+            {% endif %}
+
+            <!-- Vertical Form -->
+            <form class="row g-3" method="POST">
+              {% csrf_token %}
+              <div class="col-12">
+                <label for="customer_name" class="form-label">ลูกค้า</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+              </div>
+              <div class="col-12">
+                <label for="start_date" class="form-label">วันที่เริ่ม</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ today_date }}" required>
+              </div>
+
+              <fieldset class="col-12">
+                <legend class="col-form-label pt-0">ประเภทสินเชื่อ</legend>
+                <div class="d-flex">
+                  <div class="form-check me-3">
+                    <input class="form-check-input" type="radio" name="loan_type" id="loan_type_fixed" value="1" checked>
+                    <label class="form-check-label" for="loan_type_fixed">
+                      Fixed
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="loan_type" id="loan_type_floating" value="2">
+                    <label class="form-check-label" for="loan_type_floating">
+                      ดอกลอย
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+
+              <div class="col-12">
+                <label for="principal" class="form-label">เงินต้น</label>
+                <input type="number" class="form-control" id="principal" name="principal" required>
+              </div>
+
+              <div class="col-12" id="installments_div">
+                <label for="num_installments" class="form-label">จำนวนงวด</label>
+                <input type="number" class="form-control" id="num_installments" name="num_installments">
+              </div>
+
+              <div class="col-12">
+                <label for="perday" class="form-label">จำนวนวัน/งวด</label>
+                <input type="number" class="form-control" id="perday" name="perday" required>
+              </div>
+
+              <div class="col-12">
+                <label for="interest_rate" class="form-label">ดอกเบี้ย (%)</label>
+                <input type="number" class="form-control" id="interest_rate" name="interest_rate" required>
+              </div>
+
+              <div class="col-12">
+                <label for="admin_user" class="form-label">ผู้ดูแล</label>
+                <select class="form-control" id="admin_user" name="admin_user" required>
+                  {% for user in users %}
+                      <option value="{{ user.id }}">{{ user.appuser }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label for="loan_name" class="form-label">ชื่อวง</label>
+                <input type="text" class="form-control" id="loan_name" name="loan_name" readonly>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+              </div>
+            </form><!-- Vertical Form -->
+            
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const customerNameInput = document.getElementById('customer_name');
+        const principalInput = document.getElementById('principal');
+        const perdayInput = document.getElementById('perday');
+        const loanNameInput = document.getElementById('loan_name');
+        const loanTypeRadios = document.getElementsByName('loan_type');
+        const numInstallmentsDiv = document.getElementById('installments_div');
+
+        function updateLoanName() {
+            const customerName = customerNameInput.value;
+            const principal = principalInput.value;
+            const perday = perdayInput.value;
+            const loanType = document.querySelector('input[name="loan_type"]:checked').value;
+            const loanTypeText = loanType === '2' ? 'ดอกลอย' : 'Fixed'; // ใช้ '2' สำหรับประเภทดอกลอย
+            loanNameInput.value = `${customerName} ต้น ${principal} ราย ${perday} วัน (${loanTypeText})`;
+        }
+
+        function handleLoanTypeChange() {
+            const selectedType = document.querySelector('input[name="loan_type"]:checked').value;
+            if (selectedType === '2') { // ดอกลอย
+                numInstallmentsDiv.style.display = 'none';
+                document.getElementById('num_installments').value = '';
+            } else {
+                numInstallmentsDiv.style.display = 'block';
+            }
+            updateLoanName();
+        }
+
+        loanTypeRadios.forEach(radio => {
+            radio.addEventListener('change', handleLoanTypeChange);
+        });
+
+        customerNameInput.addEventListener('input', updateLoanName);
+        principalInput.addEventListener('input', updateLoanName);
+        perdayInput.addEventListener('input', updateLoanName);
+
+        // Initial call to set correct display based on the default selected radio button
+        handleLoanTypeChange();
+    });
+</script>
+
+{% endblock %}
