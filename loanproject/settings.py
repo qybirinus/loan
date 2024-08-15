@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #     load_dotenv(dotenv_path=env_file)
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG') == 'False'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env.bool('DEBUG', default=False)
+ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='').split(',')
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
