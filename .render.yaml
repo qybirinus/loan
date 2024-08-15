@@ -3,8 +3,8 @@ services:
   - type: web
     name: loanproject
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn loanproject.wsgi --bind 0.0.0.0:$PORT"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "gunicorn loanproject.wsgi --log-file -"
     plan: free
     routes:
       - type: basic
