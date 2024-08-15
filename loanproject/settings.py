@@ -29,7 +29,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='').split(',')
+ALLOWED_HOSTS = ['loan-y8g4.onrender.com', 'localhost', '127.0.0.1']
+
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
